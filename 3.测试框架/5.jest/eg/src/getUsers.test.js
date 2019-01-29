@@ -1,3 +1,4 @@
+jest.mock("./ajax");
 var getUsers = require("./getUsers");
 test("getUsers", function(done) {
   document.body.innerHTML = `<ul id="users"></ul>`;
