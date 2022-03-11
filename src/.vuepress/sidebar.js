@@ -3,7 +3,7 @@ const sidebar = {
         '1.index',
         '1.utils',
         '2.project',
-        '3.VueCLI',
+        '3.vuecli',
         '4.env',
         '5.ui',
         '6.layout',
@@ -107,6 +107,38 @@ const sidebar = {
         '11.slotScopeTable',
         '12.tree',
         '13.publish',
+    ],
+    '/senior/5.garbage/': [
+        '1.index',
+        '1.local',
+        '2.gitlab',
+        '3.genkins',
+        '4.centos',
+        '5.nginx'
+    ],
+    '/senior/6.webkit/': [
+        '1.index',
+        '1.local',
+        '2.gitlab',
+        '3.genkins',
+        '4.centos',
+        '5.nginx'
+    ],
+    '/senior/7.engine/': [
+        '1.index',
+        '1.local',
+        '2.gitlab',
+        '3.genkins',
+        '4.centos',
+        '5.nginx'
+    ],
+    '/senior/8.v8/': [
+        '1.index',
+        '1.local',
+        '2.gitlab',
+        '3.genkins',
+        '4.centos',
+        '5.nginx'
     ],
     '/senior/vue3/': [
         '1.index',

@@ -41,19 +41,19 @@ const nav = [{
         },
         {
             text: '五.垃圾回收',
-            link: '/senior/5/1.index'
+            link: '/senior/5.garbage/1.index'
         },
         {
             text: '六.webkit深入',
-            link: '/senior/6/1.index'
+            link: '/senior/6.webkit/1.index'
         },
         {
             text: '七.引擎',
-            link: '/senior/7/1.index'
+            link: '/senior/7.engine/1.index'
         },
         {
             text: '八.v8',
-            link: '/senior/8/1.index'
+            link: '/senior/8.v8/1.index'
         },
     ]
 },
