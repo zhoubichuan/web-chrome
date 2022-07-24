@@ -7,7 +7,7 @@
 # 2.打包
 npm run src:build
 
-cd dist
+cd web-browser
 # 3.发布到gh-pages分支
 git init
 git checkout --orphan gh-pages
@@ -29,7 +29,7 @@ git push github master
 npm run src:build
 
 # 3.进入打包目录
-cd dist
+cd web-browser
 
 # 4.发布到gh-pages分支
 git init
