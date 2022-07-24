@@ -16,7 +16,23 @@ const nav = [{
         {
             text: '四.权限',
             link: '/base/vue3.x/1.index'
-        }
+        },
+        {
+            text: '四.浏览器对象',
+            link: '/base/4.window/1.index'
+        },
+        {
+            text: '五.文档对象',
+            link: '/base/5.document/1.index'
+        },
+        {
+            text: '三.浏览器',
+            link: '/base/3.browser/1.index'
+        },
+        {
+            text: '四.web网络',
+            link: '/base/4.network/1.index'
+        },
     ]
 },
 {
