@@ -188,10 +188,10 @@ const sidebar = {
     '/senior/vue3/': [
         '1.index',
     ],
-    '/source/vue-cli2.x/': [
+    '/source/plugins/': [
         '1.index'
     ],
-    '/source/vue2.x/': [
+    '/source/tools/': [
         '1.index',
         '2.initGlobalAPI',
         '3.initMixin',

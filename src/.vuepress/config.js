@@ -1,7 +1,7 @@
 const path = require("path");
 const Webpack = require("webpack");
 module.exports = {
-  title: "browser学习笔记",
+  title: "Browser学习笔记",
   description: "风浪没平息 我宣告奔跑的意义",
   base: "/web-browser/", // 部署站点的基础路径
   port: 3009,

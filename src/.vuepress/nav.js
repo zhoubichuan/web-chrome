@@ -74,24 +74,24 @@ const nav = [{
     ]
 },
 {
-    text: '浏览器 2.x源码',
+    text: '工具与扩展',
     items: [
         {
-            text: '一.浏览器/cli2.x',
-            link: '/source/vue-cli2.x/1.index'
+            text: '一.浏览器插件',
+            link: '/source/plugins/1.index'
         },
         {
-            text: '二.浏览器 2.x',
-            link: '/source/vue2.x/1.index'
+            text: '二.开发者工具',
+            link: '/source/tools/1.index'
         },
         {
-            text: '三.浏览器-Router3.x',
+            text: '三.浏览器其他',
             link: '/source/vue-router3.x/1.index'
         }
     ]
 },
 {
-    text: '浏览器相关资料推荐',
+    text: '资料推荐',
     link: '/read',
 }
 ]

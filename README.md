@@ -12,7 +12,7 @@
   - [二.浏览器 + TS](https://zhoubichuan.github.io/web-browser/senior/typescript/1.index.html)
   - [三.构建部署](https://zhoubichuan.github.io/web-browser/senior/deploy/1.index.html)
 - 浏览器 2.x 源码
-  - [一.浏览器/cli2.x](https://zhoubichuan.github.io/web-browser/source/vue-cli2.x/1.index.html)
+  - [一.浏览器/cli2.x](https://zhoubichuan.github.io/web-browser/source/plugins/1.index.html)
   - [二.浏览器 2.x](https://zhoubichuan.github.io/web-browser/source/vue2.x/1.index.html)
   - [三.浏览器-Router3.x](https://zhoubichuan.github.io/web-browser/source/vue-router3.x/1.index.html)
   - [四.浏览器x3.x](https://zhoubichuan.github.io/web-browser/source/vuex3.x/1.index.html)
