@@ -1,14 +1,39 @@
 const path = require("path");
+const httpRequest = require("./public/mock/http.js");
 const Webpack = require("webpack");
+const bodyParser = require("body-parser");
+
 module.exports = {
   title: "Browser学习笔记",
   description: "风浪没平息 我宣告奔跑的意义",
   base: "/web-browser/", // 部署站点的基础路径
   port: 3009,
+  head: [
+    ['link', { rel: 'icon', href: '/home.png' }],
+    ['link', { rel: 'manifest', href: '/manifest.json' }],
+    ["script", { src: "/dll/vendor.dll.js" }],
+    [
+      "script",
+      {
+        src: "https://webapi.amap.com/maps?v=2.0&key=46c9ed4e2d25a0e0ee7c883fd5b1a0c8",
+      },
+    ],
+    [
+      "script",
+      {
+        src: "https://webapi.amap.com/ui/1.1/main.js?v=1.1.1",
+      },
+    ],
+  ],
   define: {
     env: {
       NODE_ENV: process.env.NODE_ENV,
     },
+  },
+  beforeDevServer(app, server, compiler) {
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: false }));
+    httpRequest(app);
   },
   alias: {
     mock: path.resolve(__dirname, "../../mock/"),
@@ -19,7 +44,15 @@ module.exports = {
   },
   stylus: { preferPathResolver: "webpack" },
   less: {},
-  scss: {},
+  scss: {
+    data: `
+    @import "~@/assets/style/var.scss";
+    @import "~@/assets/style/variables.scss";
+    @import "~@/assets/style/reset.scss";
+    @import "~@/assets/style/mixins.scss";
+    `,
+  },
+  sass: { indentedSyntax: true },
   dest: "web-browser", // 指定 vuepress 的输出目录
   markdown: {
     toc: { includeLevel: [2, 3] },
@@ -33,6 +66,15 @@ module.exports = {
         BASE_API: "'/'",
       },
     }),
+    new Webpack.DllReferencePlugin({
+      manifest: require(path.resolve(
+        __dirname,
+        "public/dll/vendor-manifest.json"
+      )),
+      name: "[name]_[hash]",
+      context: process.cwd(),
+    }),
+    [require("./demo-preview")],
     [
       "vuepress-plugin-anchor-toc",
       {
