@@ -1,6 +1,6 @@
 {
-    "name": "周必川",
-    "short_name": "周必川",
+    "name": "Browser",
+    "short_name": "web-browser",
     "start_url": "index.html",
     "display": "standalone",
     "background_color": "#2196f3",
