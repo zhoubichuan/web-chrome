@@ -70,16 +70,6 @@ const sidebar = {
         "10.dom",
         "11.bom",
     ],
-    "/base/5.document/": [
-        "1.index",
-        "1.grammar",
-        "2.morphology",
-        "3.context",
-        "4.variableobj",
-        "5.scope",
-        "6.closure",
-        "7.this"
-    ],
     "/base/3.browser/": [
         "1.index",
         "1.compiler",

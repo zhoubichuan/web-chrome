@@ -6,10 +6,6 @@ const nav = [{
             link: '/base/4.window/1.index'
         },
         {
-            text: '二.DOM对象',
-            link: '/base/5.document/1.index'
-        },
-        {
             text: '三.数据请求',
             link: '/base/vue2.x/1.index'
         },
