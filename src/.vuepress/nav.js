@@ -50,22 +50,22 @@ const nav = [{
             text: '四.事件循环',
             link: '/senior/4.component/1.index'
         },
+        // {
+        //     text: '五.垃圾回收',
+        //     link: '/senior/5.garbage/1.index'
+        // },
+        // {
+        //     text: '六.webkit深入',
+        //     link: '/senior/6.webkit/1.index'
+        // },
         {
-            text: '五.垃圾回收',
-            link: '/senior/5.garbage/1.index'
-        },
-        {
-            text: '六.webkit深入',
-            link: '/senior/6.webkit/1.index'
-        },
-        {
-            text: '七.引擎',
+            text: '七.JavaScript引擎',
             link: '/senior/7.engine/1.index'
         },
-        {
-            text: '八.其他',
-            link: '/senior/1.micro/1.index'
-        },
+        // {
+        //     text: '八.其他',
+        //     link: '/senior/1.micro/1.index'
+        // },
     ]
 },
 {
