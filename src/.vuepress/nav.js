@@ -2,7 +2,7 @@ const nav = [{
     text: '基础知识',
     items: [
         {
-            text: '一.BOM对象',
+            text: '一.浏览器对象',
             link: '/base/4.window/1.index'
         },
         {
