@@ -4,14 +4,14 @@
 npm run src:build
 
 # 2.进入打包目录
-cd web-browser
+cd web-chrome
 
 # 3.发布到gh-pages分支
 git init
 git checkout --orphan gh-pages
 git add .
 git commit -m 'gh-pages'
-git remote add github https://github.com/zhoubichuan/web-browser.git
+git remote add github https://github.com/zhoubichuan/web-chrome.git
 git push -f github gh-pages
 
 # 4.返回初始目录

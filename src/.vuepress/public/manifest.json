@@ -1,6 +1,6 @@
 {
-    "name": "Browser",
-    "short_name": "web-browser",
+    "name": "chrome",
+    "short_name": "web-chrome",
     "start_url": "index.html",
     "display": "standalone",
     "background_color": "#2196f3",

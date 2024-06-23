@@ -1,6 +1,6 @@
 .DS_Store
 node_modules/
-/web-browser
+/web-chrome
 
 # Editor directories and files
 .idea
