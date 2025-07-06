@@ -13,3 +13,11 @@ meta:
 ::: tip 前言
 一些资料推荐
 :::
+
+```sh
+# Windows
+chrome.exe --disable-web-security --user-data-dir=任意空文件夹路径
+
+# Mac
+open -n /Applications/Google\ Chrome.app/ --args --disable-web-security --user-data-dir=/Users/zhoubichuan/chrome
+```
