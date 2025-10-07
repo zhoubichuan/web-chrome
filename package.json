@@ -12,6 +12,7 @@
     "build": "vuepress build src",
     "build:comps": "gulp",
     "publish": "npm run build:comps && cd lib && npm publish",
+    "scp:prod": "scp -r ./web-chrome/* root@zhoubichuan.com:/usr/src/zhoubichuan/prod/",
     "deploy": "bash deploy.sh",
     "github": "bash github.sh",
     "gitee": "bash gitee.sh",
