@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script type="module">document.addEventListener("DOMContentLoaded",()=>{const insScript=document.createElement("script");const date=Date.now();insScript.src="/inscode_devtools_sdk.js?v="+date;insScript.type="module";document.body.appendChild(insScript);});</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebNFC 演示 - 让网页也能"碰一碰"</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .btn-error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .status-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .nfc-icon {
+            animation: nfc-wave 1.5s infinite;
+        }
+        
+        @keyframes nfc-wave {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-12 shadow-lg">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center">
+                <div class="flex justify-center mb-4">
+                    <i class="fas fa-broadcast-tower text-5xl nfc-icon"></i>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold mb-3">WebNFC 演示</h1>
+                <p class="text-xl opacity-90">让网页也能"碰一碰"——基于 JavaScript 的近场通信实战</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 py-12">
+        <!-- Support Check Section -->
+        <section class="mb-12">
+            <div id="supportCheck" class="bg-white rounded-2xl shadow-xl p-8 card-hover">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        浏览器支持检测
+                    </h2>
+                    <span id="supportStatus" class="px-4 py-2 rounded-full text-sm font-semibold">
+                        检测中...
+                    </span>
+                </div>
+                <p class="text-gray-600 mb-6">
+                    WebNFC 需要 Chrome 浏览器（Android）且运行在 HTTPS 或 localhost 环境下
+                </p>
+                <div id="supportDetails" class="hidden">
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                        <p class="text-blue-700">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <strong>提示：</strong>首次使用会弹出权限请求，请点击"允许"以启用 NFC 功能
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Three Column Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Read Section -->
+            <section class="bg-white rounded-2xl shadow-xl p-8 card-hover">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-wifi text-3xl text-blue-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">读取 NFC 标签</h2>
+                    <p class="text-gray-600 text-sm">扫描并读取 NFC 标签中的数据</p>
+                </div>
+                
+                <button id="scanBtn" onclick="startReading()" class="btn-primary w-full text-white font-semibold py-4 px-6 rounded-xl mb-6 flex items-center justify-center">
+                    <i class="fas fa-search mr-3"></i>
+                    开始扫描
+                </button>
+                
+                <div id="scanStatus" class="hidden text-center mb-4">
+                    <div class="inline-flex items-center text-blue-600">
+                        <div class="status-indicator w-3 h-3 bg-blue-600 rounded-full mr-2"></div>
+                        <span>正在等待 NFC 标签...</span>
+                    </div>
+                </div>
+                
+                <div id="readResults" class="space-y-3">
+                    <p class="text-gray-400 text-sm text-center italic">读取的数据将显示在这里</p>
+                </div>
+            </section>
+
+            <!-- Write URL Section -->
+            <section class="bg-white rounded-2xl shadow-xl p-8 card-hover">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-link text-3xl text-green-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">写入 URL</h2>
+                    <p class="text-gray-600 text-sm">向 NFC 标签写入网址链接</p>
+                </div>
+                
+                <input type="text" id="urlInput" value="https://example.com/product" 
+                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 mb-4 focus:border-green-500 focus:outline-none transition-colors"
+                       placeholder="输入要写入的 URL">
+                
+                <button onclick="writeURL()" class="btn-success w-full text-white font-semibold py-4 px-6 rounded-xl mb-4">
+                    <i class="fas fa-download mr-3"></i>
+                    写入 URL 到标签
+                </button>
+                
+                <div id="writeUrlStatus" class="text-center"></div>
+            </section>
+
+            <!-- Write Text & JSON Section -->
+            <section class="bg-white rounded-2xl shadow-xl p-8 card-hover">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-file-alt text-3xl text-purple-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">写入文本/JSON</h2>
+                    <p class="text-gray-600 text-sm">写入纯文本或结构化数据</p>
+                </div>
+                
+                <button onclick="writeText()" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-xl mb-3">
+                    <i class="fas fa-font mr-3"></i>
+                    写入示例文本
+                </button>
+                
+                <button onclick="writeJSON()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-xl mb-4">
+                    <i class="fas fa-code mr-3"></i>
+                    写入 JSON 数据
+                </button>
+                
+                <div id="writeDataStatus" class="text-center"></div>
+            </section>
+        </div>
+
+        <!-- Data Display Section -->
+        <section class="mt-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-database text-blue-500 mr-3"></i>
+                    数据记录
+                </h2>
+                <div id="dataLog" class="space-y-3 max-h-96 overflow-y-auto">
+                    <div class="bg-gray-50 rounded-lg p-4 text-center text-gray-400">
+                        暂无数据记录
+                    </div>
+                </div>
+                <button onclick="clearLog()" class="mt-4 text-gray-500 hover:text-gray-700 text-sm">
+                    <i class="fas fa-trash mr-2"></i>
+                    清空记录
+                </button>
+            </div>
+        </section>
+
+        <!-- Info Section -->
+        <section class="mt-12">
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border-2 border-blue-100">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
+                    使用指南
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold text-gray-700 mb-2">✅ 核心优势</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>不依赖原生 App</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>跨平台（Chrome + Android）</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>简单易集成，仅需几行 JS</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-700 mb-2">⚠️ 注意事项</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>必须使用 HTTPS 或 localhost</li>
+                            <li><i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>需要用户授权 NFC 权限</li>
+                            <li><i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>目前主要支持 Android Chrome</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p class="text-gray-400 mb-2">
+                <i class="fas fa-code mr-2"></i>
+                基于 WebNFC API 实现 | 博客来源：
+                <a href="https://blog.csdn.net/2501_92807076/article/details/160026956" 
+                   class="text-blue-400 hover:text-blue-300 underline" target="_blank">
+                    CSDN - WebNFC：让网页也能"碰一碰"
+                </a>
+            </p>
+            <p class="text-gray-500 text-sm">
+                🚀 你不需要 app，只要一个 URL 和一根 NFC 标签，就能开启万物互联的新篇章
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Data log array
+        let dataLog = [];
+        
+        // Check browser support on load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkSupport();
+        });
+
+        // Check WebNFC support
+        function checkSupport() {
+            const statusEl = document.getElementById('supportStatus');
+            const detailsEl = document.getElementById('supportDetails');
+            
+            if ('NDEFReader' in window) {
+                statusEl.className = 'px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-700';
+                statusEl.innerHTML = '<i class="fas fa-check mr-2"></i>支持 WebNFC';
+                detailsEl.classList.remove('hidden');
+                addLog('system', '浏览器支持 WebNFC', null);
+            } else {
+                statusEl.className = 'px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-700';
+                statusEl.innerHTML = '<i class="fas fa-times mr-2"></i>不支持 WebNFC';
+                addLog('error', '当前浏览器不支持 WebNFC', null);
+                
+                // Show detailed error message
+                const supportCheck = document.getElementById('supportCheck');
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'mt-4 bg-red-50 border-l-4 border-red-500 p-4 rounded';
+                errorMsg.innerHTML = `
+                    <p class="text-red-700">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        <strong>不支持的原因：</strong><br>
+                        • 请使用 Chrome 浏览器（Android 设备）<br>
+                        • 确保网站运行在 HTTPS 或 localhost 环境下<br>
+                        • iOS Safari 暂不支持 WebNFC
+                    </p>
+                `;
+                supportCheck.appendChild(errorMsg);
+            }
+        }
+
+        // Start reading NFC tags
+        async function startReading() {
+            const scanBtn = document.getElementById('scanBtn');
+            const scanStatus = document.getElementById('scanStatus');
+            const readResults = document.getElementById('readResults');
+            
+            if (!('NDEFReader' in window)) {
+                alert('❌ 您的浏览器不支持 WebNFC');
+                return;
+            }
+            
+            try {
+                scanBtn.disabled = true;
+                scanBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i>扫描中...';
+                scanStatus.classList.remove('hidden');
+                readResults.innerHTML = '';
+                
+                const reader = new NDEFReader();
+                await reader.scan();
+                
+                addLog('info', '开始扫描 NFC 标签', null);
+                
+                reader.addEventListener('reading', (event) => {
+                    scanStatus.classList.add('hidden');
+                    scanBtn.disabled = false;
+                    scanBtn.innerHTML = '<i class="fas fa-search mr-3"></i>开始扫描';
+                    
+                    const record = event.message.records[0];
+                    const data = decodeNDEFRecord(record);
+                    
+                    // Display result
+                    readResults.innerHTML = `
+                        <div class="bg-green-50 border-2 border-green-200 rounded-xl p-4">
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 text-xl mr-3 mt-1"></i>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-green-800 mb-2">成功读取 NFC 数据</p>
+                                    <div class="bg-white rounded-lg p-3 font-mono text-sm text-gray-700 break-all">
+                                        ${escapeHtml(data)}
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        <i class="fas fa-tag mr-1"></i>
+                                        类型：${record.recordType} | 媒体类型：${record.mediaType || 'N/A'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    addLog('success', '读取 NFC 标签', data);
+                });
+                
+                reader.addEventListener('error', (event) => {
+                    scanStatus.classList.add('hidden');
+                    scanBtn.disabled = false;
+                    scanBtn.innerHTML = '<i class="fas fa-search mr-3"></i>开始扫描';
+                    
+                    const errorMsg = `读取错误：${event.error}`;
+                    readResults.innerHTML = `
+                        <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                            <p class="text-red-700"><i class="fas fa-times-circle mr-2"></i>${errorMsg}</p>
+                        </div>
+                    `;
+                    addLog('error', '读取失败', errorMsg);
+                });
+                
+            } catch (error) {
+                scanBtn.disabled = false;
+                scanBtn.innerHTML = '<i class="fas fa-search mr-3"></i>开始扫描';
+                scanStatus.classList.add('hidden');
+                
+                const errorMsg = `权限拒绝或硬件不支持：${error.message}`;
+                readResults.innerHTML = `
+                    <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                        <p class="text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>${errorMsg}</p>
+                    </div>
+                `;
+                addLog('error', '扫描失败', errorMsg);
+            }
+        }
+
+        // Write URL to NFC tag
+        async function writeURL() {
+            const url = document.getElementById('urlInput').value.trim();
+            const statusEl = document.getElementById('writeUrlStatus');
+            
+            if (!url) {
+                showStatus(statusEl, '请输入 URL', 'error');
+                return;
+            }
+            
+            if (!('NDEFWriter' in window)) {
+                showStatus(statusEl, '浏览器不支持写入功能', 'error');
+                return;
+            }
+            
+            try {
+                statusEl.innerHTML = '<span class="text-blue-600"><i class="fas fa-spinner fa-spin mr-2"></i>正在写入...</span>';
+                
+                const writer = new NDEFWriter();
+                const record = new NDEFRecord({ recordType: 'url', data: url });
+                await writer.write(record);
+                
+                showStatus(statusEl, '✅ NFC 标签已成功写入 URL！', 'success');
+                addLog('success', '写入 URL', url);
+                
+            } catch (error) {
+                showStatus(statusEl, `❌ 写入失败：${error.message}`, 'error');
+                addLog('error', '写入 URL 失败', error.message);
+            }
+        }
+
+        // Write text to NFC tag
+        async function writeText() {
+            const statusEl = document.getElementById('writeDataStatus');
+            
+            if (!('NDEFWriter' in window)) {
+                showStatus(statusEl, '浏览器不支持写入功能', 'error');
+                return;
+            }
+            
+            try {
+                statusEl.innerHTML = '<span class="text-blue-600"><i class="fas fa-spinner fa-spin mr-2"></i>正在写入...</span>';
+                
+                const writer = new NDEFWriter();
+                const textRecord = new NDEFRecord({ recordType: 'text', data: 'Hello from WebNFC!' });
+                await writer.write(textRecord);
+                
+                showStatus(statusEl, '✅ 文本已成功写入 NFC 标签！', 'success');
+                addLog('success', '写入文本', 'Hello from WebNFC!');
+                
+            } catch (error) {
+                showStatus(statusEl, `❌ 写入失败：${error.message}`, 'error');
+                addLog('error', '写入文本失败', error.message);
+            }
+        }
+
+        // Write JSON to NFC tag
+        async function writeJSON() {
+            const statusEl = document.getElementById('writeDataStatus');
+            
+            if (!('NDEFWriter' in window)) {
+                showStatus(statusEl, '浏览器不支持写入功能', 'error');
+                return;
+            }
+            
+            try {
+                statusEl.innerHTML = '<span class="text-blue-600"><i class="fas fa-spinner fa-spin mr-2"></i>正在写入...</span>';
+                
+                const writer = new NDEFWriter();
+                const jsonData = JSON.stringify({ userId: "U12345", role: "admin", timestamp: new Date().toISOString() });
+                const jsonRecord = new NDEFRecord({ 
+                    recordType: 'mime', 
+                    mediaType: 'application/json', 
+                    data: jsonData 
+                });
+                await writer.write(jsonRecord);
+                
+                showStatus(statusEl, '✅ JSON 数据已成功写入 NFC 标签！', 'success');
+                addLog('success', '写入 JSON', jsonData);
+                
+            } catch (error) {
+                showStatus(statusEl, `❌ 写入失败：${error.message}`, 'error');
+                addLog('error', '写入 JSON 失败', error.message);
+            }
+        }
+
+        // Helper: Decode NDEF record
+        function decodeNDEFRecord(record) {
+            const decoder = new TextDecoder();
+            
+            switch (record.recordType) {
+                case 'text':
+                    return decoder.decode(record.data);
+                case 'url':
+                    return decoder.decode(record.data);
+                case 'mime':
+                    if (record.mediaType === 'application/json') {
+                        try {
+                            return JSON.parse(decoder.decode(record.data));
+                        } catch {
+                            return decoder.decode(record.data);
+                        }
+                    }
+                    return decoder.decode(record.data);
+                default:
+                    return decoder.decode(record.data);
+            }
+        }
+
+        // Helper: Show status message
+        function showStatus(element, message, type) {
+            const colorClass = type === 'success' ? 'text-green-600' : 'text-red-600';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-times-circle';
+            element.innerHTML = `<span class="${colorClass}"><i class="fas ${icon} mr-2"></i>${message}</span>`;
+            
+            // Auto clear after 5 seconds
+            setTimeout(() => {
+                element.innerHTML = '';
+            }, 5000);
+        }
+
+        // Helper: Add log entry
+        function addLog(type, action, data) {
+            const timestamp = new Date().toLocaleTimeString();
+            dataLog.unshift({ type, action, data, timestamp });
+            renderLog();
+        }
+
+        // Helper: Render log
+        function renderLog() {
+            const logEl = document.getElementById('dataLog');
+            
+            if (dataLog.length === 0) {
+                logEl.innerHTML = '<div class="bg-gray-50 rounded-lg p-4 text-center text-gray-400">暂无数据记录</div>';
+                return;
+            }
+            
+            logEl.innerHTML = dataLog.map((entry, index) => {
+                const typeColors = {
+                    success: 'bg-green-50 border-green-200 text-green-800',
+                    error: 'bg-red-50 border-red-200 text-red-800',
+                    info: 'bg-blue-50 border-blue-200 text-blue-800',
+                    system: 'bg-gray-50 border-gray-200 text-gray-800'
+                };
+                
+                const typeIcons = {
+                    success: 'fa-check-circle text-green-500',
+                    error: 'fa-times-circle text-red-500',
+                    info: 'fa-info-circle text-blue-500',
+                    system: 'fa-cog text-gray-500'
+                };
+                
+                return `
+                    <div class="${typeColors[entry.type] || typeColors.system} border rounded-lg p-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas ${typeIcons[entry.type]} mr-2"></i>
+                                    <span class="font-semibold">${entry.action}</span>
+                                    <span class="text-xs opacity-60 ml-auto">${entry.timestamp}</span>
+                                </div>
+                                ${entry.data ? `
+                                    <div class="bg-white bg-opacity-50 rounded p-2 font-mono text-xs overflow-x-auto">
+                                        ${typeof entry.data === 'object' ? JSON.stringify(entry.data, null, 2) : escapeHtml(String(entry.data))}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Helper: Clear log
+        function clearLog() {
+            dataLog = [];
+            renderLog();
+        }
+
+        // Helper: Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
