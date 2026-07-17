@@ -176,9 +176,6 @@ const sidebar = {
         '4.centos',
         '5.nginx'
     ],
-    '/senior/vue3/': [
-        '1.index',
-    ],
     '/source/plugins/': [
         '1.index'
     ],
